@@ -104,10 +104,11 @@ def get_webhook_info():
     tg_bot = telebot.TeleBot(config.UA_BOT_TOKEN)
     tg_bot_info = tg_bot.get_webhook_info()
 
+    # TODO: why not all fields?
     return {
-        'last_error_date': tg_bot_info['last_error_date'],
-        'last_error_message': tg_bot_info['last_error_message'],
-        'max_connections': tg_bot_info['max_connections'],
-        'allowed_updates': tg_bot_info['allowed_updates'],
-        'pending_update_count': tg_bot_info['pending_update_count'],
+        "last_error_date": tg_bot_info.last_error_date,
+        "last_error_message": tg_bot_info.last_error_message,
+        "max_connections": tg_bot_info.max_connections,
+        "allowed_updates": tg_bot_info.allowed_updates,
+        "pending_update_count": tg_bot_info.pending_update_count,
     }

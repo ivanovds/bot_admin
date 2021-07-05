@@ -39,7 +39,6 @@ def ping_prod_ua_bot_func():
 
 @monitor_prod_bots_webhook_info.scheduled_job('interval', minutes=0.2)
 def monitor_prod_bots_webhook_info_func():
-    print("monitor_prod_bots_webhook_info_func")
     ua_bot_info = get_webhook_info()
     print(ua_bot_info)
     if ua_bot_info['pending_update_count'] >= config.MAX_PENDING_UPDATE_COUNT:
