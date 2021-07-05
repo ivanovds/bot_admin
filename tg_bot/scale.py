@@ -37,10 +37,9 @@ def get_current_dyno_quantity(app_name, process_name):
         result = requests.get(url, headers=HEADERS)
         print(json.loads(result.text))
         for formation in json.loads(result.text):
-            app_formation = formation.get("app")
-            if app_formation is not None:
-                if app_formation["type"] == process_name:
-                    current_quantity = formation["quantity"]
-                    return current_quantity
+            print(formation["type"], process_name)
+            if formation["type"] == process_name:
+                current_quantity = formation["quantity"]
+                return current_quantity
     except Exception as e:
         print(f"get_current_dyno_quantity: {e}")
