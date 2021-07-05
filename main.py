@@ -17,6 +17,11 @@ def get_message():
     return "OK", 200
 
 
+@server.route("/")
+def home():
+    return "OK", 200
+
+
 if __name__ == "__main__":
     from tg_bot.standard_handlers import *
     from tg_bot.message_handlers import *
