@@ -9,6 +9,7 @@ from tg_bot import reply_markup as rm
 from .utils import (
     is_admin, notify_admin, message_user_access,
     message_admin_access, get_webhook_info,
+    notify_monitoring_chat,
 )
 
 
@@ -45,11 +46,11 @@ def get_webhook_info_command(message):
                      disable_web_page_preview=True)
 
 
-# @bot.message_handler(commands=['test'])
-# @message_admin_access()
-# def test_command(message):
-#
-#     print('ok')
+@bot.message_handler(commands=['test'])
+@message_admin_access()
+def test_command(message):
+    notify_monitoring_chat('test')
+    print('ok')
 
 
 @bot.message_handler(content_types=["text", "photo", "document"])

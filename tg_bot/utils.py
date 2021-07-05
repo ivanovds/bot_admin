@@ -72,12 +72,12 @@ def notify_admin(message):
     except Exception as err:
         err_msg = error_report_to_chat % f'ERR notify_admin: {err}'
         print(err_msg)
-        notify_feedback_chat(err_msg)
+        notify_monitoring_chat(err_msg)
         return False
 
 
 # Feedback chat notifications:
-def notify_feedback_chat(message, document=False, caption='', markdown=False):
+def notify_monitoring_chat(message, document=False, caption='', markdown=False):
     try:
         if not document:
             if markdown:
