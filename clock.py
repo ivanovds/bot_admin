@@ -5,6 +5,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
 
 import config
+from tg_bot.scale import get_current_dyno_quantity, scale_dynos
 from tg_bot.utils import notify_feedback_chat, get_webhook_info
 
 ping_yourself = BackgroundScheduler()
@@ -40,11 +41,19 @@ def ping_prod_ua_bot_func():
 @monitor_prod_bots_webhook_info.scheduled_job('interval', minutes=0.2)
 def monitor_prod_bots_webhook_info_func():
     ua_bot_info = get_webhook_info()
-    print(ua_bot_info)
     if ua_bot_info["pending_update_count"] >= config.MAX_PENDING_UPDATE_COUNT:
-        msg = f'UA_BOT: pending_update_count >= {config.MAX_PENDING_UPDATE_COUNT}\nwebhook_info: {ua_bot_info}'
-        print(msg)
+        msg = f"UA_BOT: pending_update_count >= {config.MAX_PENDING_UPDATE_COUNT}\nwebhook_info: {ua_bot_info}"
         notify_feedback_chat(msg)
+        heroku_app_name = config.UA_BOT_URL_HEROKU.replace("https://", "").replace(".herokuapp.com/", ""),
+        current_dyno_quantity = get_current_dyno_quantity(
+            app_name=heroku_app_name, process_name=config.UA_BOT_MAIN_PROCESS
+        )
+
+        new_dyno_quantity = 1
+        success = scale_dynos(app_name=heroku_app_name, process_name=config.UA_BOT_MAIN_PROCESS, num=new_dyno_quantity)
+
+        if not success:
+            print("ping_yourself_func: failed to scale")
 
         time.sleep(10)
 

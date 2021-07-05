@@ -110,5 +110,5 @@ def get_webhook_info():
         if tg_bot_info["ok"]:
             return tg_bot_info["result"]
 
-        print("Status not 'ok'")
-    print("tg_bot_info is None")
+        print("get_webhook_info: Status not 'ok'")
+    print("get_webhook_info: tg_bot_info is None")
