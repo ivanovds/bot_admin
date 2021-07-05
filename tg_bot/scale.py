@@ -31,14 +31,16 @@ def get_current_dyno_quantity(app_name, process_name):
     """
     to receive app_name: app_url.replace("https://", "").replace(".herokuapp.com/", "")
     """
-    url = f"https://api.heroku.com/apps/{app_name}/formation/{process_name}"
+    url = f"https://api.heroku.com/apps/{app_name}/formation/"
     print(url)
     try:
         result = requests.get(url, headers=HEADERS)
         print(json.loads(result.text))
         for formation in json.loads(result.text):
-            if formation["type"] == process_name:
-                current_quantity = formation["quantity"]
-                return current_quantity
+            app_formation = formation.get("app")
+            if app_formation is not None:
+                if app_formation["type"] == process_name:
+                    current_quantity = formation["quantity"]
+                    return current_quantity
     except Exception as e:
         print(f"get_current_dyno_quantity: {e}")
