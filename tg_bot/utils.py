@@ -1,4 +1,6 @@
 from functools import wraps
+
+import requests
 import telebot
 
 from tg_bot import bot
@@ -101,14 +103,10 @@ def notify_feedback_chat(message, document=False, caption='', markdown=False):
 
 
 def get_webhook_info():
-    tg_bot = telebot.TeleBot(config.UA_BOT_TOKEN)
-    tg_bot_info = tg_bot.get_webhook_info()
+    tg_bot_info = requests.get(f"https://api.telegram.org/bot{config.UA_BOT_TOKEN}/getWebhookInfo")
+    if tg_bot_info is not None:
+        tg_bot_info = tg_bot_info.json()
+        print("tg_bot_info")
+        return tg_bot_info
 
-    # TODO: why not all fields?
-    return {
-        "last_error_date": tg_bot_info.last_error_date,
-        "last_error_message": tg_bot_info.last_error_message,
-        "max_connections": tg_bot_info.max_connections,
-        "allowed_updates": tg_bot_info.allowed_updates,
-        "pending_update_count": tg_bot_info.pending_update_count,
-    }
+    print("tg_bot_info is None")
