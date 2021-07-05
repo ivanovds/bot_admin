@@ -108,7 +108,10 @@ def get_webhook_info():
         tg_bot_info = tg_bot_info.json()
 
         if tg_bot_info["ok"]:
-            return tg_bot_info["result"]
+            keep_keys = {
+                "last_error_date", "last_error_message", "max_connections", "allowed_updates", "pending_update_count"
+            }
+            return {key: value for key, value in tg_bot_info["result"] if key in keep_keys}
 
-        print("get_webhook_info: Status not 'ok'")
-    print("get_webhook_info: tg_bot_info is None")
+        print("ERR get_webhook_info: Status not 'ok'")
+    print("ERR get_webhook_info: tg_bot_info is None")
