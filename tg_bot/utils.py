@@ -1,4 +1,6 @@
 from functools import wraps
+
+import requests
 import telebot
 
 from tg_bot import bot
@@ -81,15 +83,15 @@ def notify_monitoring_chat(message, document=False, caption='', markdown=False):
     try:
         if not document:
             if markdown:
-                bot.send_message(chat_id=config.MONITORING_CHAT_ID,
+                bot.send_message(chat_id=config.FEEDBACK_CHAT_ID,
                                  text=message,
                                  )
             else:
-                bot.send_message(chat_id=config.MONITORING_CHAT_ID,
+                bot.send_message(chat_id=config.FEEDBACK_CHAT_ID,
                                  text=message,
                                  )
         else:
-            bot.send_document(chat_id=config.MONITORING_CHAT_ID,
+            bot.send_document(chat_id=config.FEEDBACK_CHAT_ID,
                               data=message,
                               caption=caption
                               )
@@ -101,13 +103,15 @@ def notify_monitoring_chat(message, document=False, caption='', markdown=False):
 
 
 def get_webhook_info():
-    tg_bot = telebot.TeleBot(config.UA_BOT_TOKEN)
-    tg_bot_info = tg_bot.get_webhook_info()
+    tg_bot_info = requests.get(f"https://api.telegram.org/bot{config.UA_BOT_TOKEN}/getWebhookInfo")
+    if tg_bot_info is not None:
+        tg_bot_info = tg_bot_info.json()
 
-    return {
-        'last_error_date': tg_bot_info['last_error_date'],
-        'last_error_message': tg_bot_info['last_error_message'],
-        'max_connections': tg_bot_info['max_connections'],
-        'allowed_updates': tg_bot_info['allowed_updates'],
-        'pending_update_count': tg_bot_info['pending_update_count'],
-    }
+        if tg_bot_info["ok"]:
+            keep_keys = {
+                "last_error_date", "last_error_message", "max_connections", "allowed_updates", "pending_update_count"
+            }
+            return {key: value for key, value in tg_bot_info["result"] if key in keep_keys}
+
+        print("ERR get_webhook_info: Status not 'ok'")
+    print("ERR get_webhook_info: tg_bot_info is None")
