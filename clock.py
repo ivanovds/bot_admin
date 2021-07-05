@@ -48,12 +48,13 @@ def monitor_prod_bots_webhook_info_func():
         current_dyno_quantity = get_current_dyno_quantity(
             app_name=heroku_app_name, process_name=config.UA_BOT_MAIN_PROCESS
         )
+        print(current_dyno_quantity)
 
         new_dyno_quantity = 1
         success = scale_dynos(app_name=heroku_app_name, process_name=config.UA_BOT_MAIN_PROCESS, num=new_dyno_quantity)
 
         if not success:
-            print("ping_yourself_func: failed to scale")
+            print("ERR monitor_prod_bots_webhook_info_func: failed to scale")
 
         time.sleep(10)
 
