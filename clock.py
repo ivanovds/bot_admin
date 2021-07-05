@@ -59,5 +59,6 @@ if config.ENVIRONMENT == 'PROD':
     if config.UA_BOT_TOKEN is None:
         notify_feedback_chat('🆘 UA_BOT_TOKEN is not set up in heroku config!')
     else:
+        print("monitor_prod_bots_webhook_info.start()")
         monitor_prod_bots_webhook_info.start()
 
