@@ -1,7 +1,6 @@
 import time
 
 import requests
-import telebot
 from apscheduler.schedulers.background import BackgroundScheduler
 
 import config
@@ -37,10 +36,11 @@ def ping_prod_ua_bot_func():
         notify_feedback_chat(err_msg)
 
 
-@monitor_prod_bots_webhook_info.scheduled_job('interval', seconds=1)
+@monitor_prod_bots_webhook_info.scheduled_job('interval', seconds=10)
 def monitor_prod_bots_webhook_info_func():
 
     ua_bot_info = get_webhook_info()
+    print(ua_bot_info)
     if ua_bot_info['pending_update_count'] >= config.MAX_PENDING_UPDATE_COUNT:
         msg = f'UA_BOT: pending_update_count >= {config.MAX_PENDING_UPDATE_COUNT}\nwebhook_info: {ua_bot_info}'
         print(msg)
