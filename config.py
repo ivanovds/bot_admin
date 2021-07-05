@@ -15,14 +15,14 @@ ENVIRONMENT = os.environ.get('ENVIRONMENT', None)  # 'DEV'/'TEST'/'PROD'
 
 ADMIN_ID = 298760372
 USERS = [ADMIN_ID, 301327435]
-FEEDBACK_CHAT_ID = os.environ.get('FEEDBACK_CHAT_ID')
+MONITORING_CHAT_ID = os.environ.get('MONITORING_CHAT_ID')
 
 
 UA_BOT_URL_HEROKU = os.environ.get('UA_BOT_URL_HEROKU', None)  # PROD bot
 UA_BOT_TOKEN = os.environ.get('UA_BOT_TOKEN')
 
 
-MAX_PENDING_UPDATE_COUNT = 5
+MAX_PENDING_UPDATE_COUNT = os.environ.get('MAX_PENDING_UPDATE_COUNT', 5)
 
 if os.path.isfile('./config_user.py'):
     from config_user import *
