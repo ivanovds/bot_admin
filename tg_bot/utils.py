@@ -106,7 +106,9 @@ def get_webhook_info():
     tg_bot_info = requests.get(f"https://api.telegram.org/bot{config.UA_BOT_TOKEN}/getWebhookInfo")
     if tg_bot_info is not None:
         tg_bot_info = tg_bot_info.json()
-        print("tg_bot_info")
-        return tg_bot_info
 
+        if tg_bot_info["ok"]:
+            return tg_bot_info["result"]
+
+        print("Status not 'ok'")
     print("tg_bot_info is None")
