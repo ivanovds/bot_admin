@@ -31,7 +31,7 @@ def get_current_dyno_quantity(app_name, process_name):
     """
     to receive app_name: app_url.replace("https://", "").replace(".herokuapp.com/", "")
     """
-    url = f"https://api.heroku.com/apps/{app_name}/formation/"
+    url = f"https://api.heroku.com/apps/{app_name}/formation/{process_name}"
     print(url)
     try:
         result = requests.get(url, headers=HEADERS)
