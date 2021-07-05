@@ -35,9 +35,7 @@ def get_current_dyno_quantity(app_name, process_name):
     print(url)
     try:
         result = requests.get(url, headers=HEADERS)
-        print(json.loads(result.text))
         for formation in json.loads(result.text):
-            print(formation["type"], process_name)
             if formation["type"] == process_name:
                 current_quantity = formation["quantity"]
                 return current_quantity

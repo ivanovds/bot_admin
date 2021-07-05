@@ -55,6 +55,8 @@ def monitor_prod_bots_webhook_info_func():
 
         if not success:
             print("ERR monitor_prod_bots_webhook_info_func: failed to scale")
+        else:
+            print("Scaled")
 
         time.sleep(10)
 
