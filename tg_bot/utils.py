@@ -81,15 +81,15 @@ def notify_feedback_chat(message, document=False, caption='', markdown=False):
     try:
         if not document:
             if markdown:
-                bot.send_message(chat_id=config.FEEDBACK_CHAT_ID,
+                bot.send_message(chat_id=config.MONITORING_CHAT_ID,
                                  text=message,
                                  )
             else:
-                bot.send_message(chat_id=config.FEEDBACK_CHAT_ID,
+                bot.send_message(chat_id=config.MONITORING_CHAT_ID,
                                  text=message,
                                  )
         else:
-            bot.send_document(chat_id=config.FEEDBACK_CHAT_ID,
+            bot.send_document(chat_id=config.MONITORING_CHAT_ID,
                               data=message,
                               caption=caption
                               )
