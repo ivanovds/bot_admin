@@ -44,7 +44,7 @@ def monitor_prod_bots_webhook_info_func():
     if ua_bot_info["pending_update_count"] >= config.MAX_PENDING_UPDATE_COUNT:
         # msg = f"UA_BOT: pending_update_count >= {config.MAX_PENDING_UPDATE_COUNT}\nwebhook_info: {ua_bot_info}"
         # notify_feedback_chat(msg)
-        heroku_app_name = config.UA_BOT_URL_HEROKU.replace("https://", "").replace(".herokuapp.com/", ""),
+        heroku_app_name = config.UA_BOT_URL_HEROKU.replace("https://", "").replace(".herokuapp.com/", "")
         current_dyno_quantity = get_current_dyno_quantity(
             app_name=heroku_app_name, process_name=config.UA_BOT_MAIN_PROCESS
         )
