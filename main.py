@@ -24,7 +24,6 @@ if __name__ == "__main__":
     # from clock import *
 
     if config.USE_WEBHOOK:
-        print("started MAIN")
         bot.set_webhook(url=config.APP_URL_HEROKU + config.BOT_TOKEN, max_connections=100)
         server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
     else:

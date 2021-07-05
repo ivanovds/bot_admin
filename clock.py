@@ -2,13 +2,14 @@ import time
 
 import requests
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.blocking import BlockingScheduler
 
 import config
 from tg_bot.utils import notify_feedback_chat, get_webhook_info
 
 ping_yourself = BackgroundScheduler()
 ping_prod_ua_bot = BackgroundScheduler()
-monitor_prod_bots_webhook_info = BackgroundScheduler()
+monitor_prod_bots_webhook_info = BlockingScheduler()
 
 
 @ping_yourself.scheduled_job('interval', minutes=5)
@@ -36,9 +37,9 @@ def ping_prod_ua_bot_func():
         notify_feedback_chat(err_msg)
 
 
-@monitor_prod_bots_webhook_info.scheduled_job('interval', seconds=10)
+@monitor_prod_bots_webhook_info.scheduled_job('interval', minutes=0.2)
 def monitor_prod_bots_webhook_info_func():
-
+    print("monitor_prod_bots_webhook_info_func")
     ua_bot_info = get_webhook_info()
     print(ua_bot_info)
     if ua_bot_info['pending_update_count'] >= config.MAX_PENDING_UPDATE_COUNT:
@@ -59,6 +60,5 @@ if config.ENVIRONMENT == 'PROD':
     if config.UA_BOT_TOKEN is None:
         notify_feedback_chat('🆘 UA_BOT_TOKEN is not set up in heroku config!')
     else:
-        print("monitor_prod_bots_webhook_info.start()")
         monitor_prod_bots_webhook_info.start()
 
