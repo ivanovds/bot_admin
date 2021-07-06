@@ -41,8 +41,9 @@ def canceled(message):
 @bot.message_handler(commands=['ua_webhook_info'])
 @message_user_access()
 def get_webhook_info_command(message):
+    text = str(get_webhook_info())
     bot.send_message(chat_id=message.from_user.id,
-                     text=get_webhook_info(),
+                     text=text,
                      disable_web_page_preview=True)
 
 
