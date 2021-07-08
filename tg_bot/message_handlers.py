@@ -1,15 +1,11 @@
 """
 Handlers for all non standard incoming messages
 """
-import os
-
 
 from tg_bot import bot, dict_text
-from tg_bot import reply_markup as rm
 from .utils import (
-    is_admin, notify_admin, message_user_access,
+    message_user_access,
     message_admin_access, get_webhook_info,
-    notify_monitoring_chat,
 )
 
 
@@ -50,7 +46,12 @@ def get_webhook_info_command(message):
 @bot.message_handler(commands=['test'])
 @message_admin_access()
 def test_command(message):
-    notify_monitoring_chat('test')
+    import config
+    from monitoring.scale import get_current_dyno_quantity
+    heroku_app_name = config.UA_BOT_URL_HEROKU.replace("https://", "").replace(".herokuapp.com/", "")
+    current_dyno_quantity = get_current_dyno_quantity(
+        app_name=heroku_app_name, process_name=config.UA_BOT_MAIN_PROCESS
+    )
     print('ok')
 
 

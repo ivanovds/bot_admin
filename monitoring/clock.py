@@ -5,7 +5,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
 
 import config
-from tg_bot.scale import get_current_dyno_quantity, scale_dynos
+from monitoring.scale import get_current_dyno_quantity, scale_dynos
 from tg_bot.utils import notify_monitoring_chat, get_webhook_info
 
 
@@ -28,7 +28,8 @@ def ping_yourself_func():
 ping_yourself.start()
 
 
-@ping_prod_ua_bot.scheduled_job('interval', minutes=1)
+# jitter: Run the with an extra-delay picked randomly in a [-30,+30] seconds window.
+@ping_prod_ua_bot.scheduled_job('interval', minutes=3, jitter=30)
 def ping_prod_ua_bot_func():
     response = requests.request("GET", config.UA_BOT_URL_HEROKU)
     print(f'SCHEDULED_JOB: PROD APP ping every 1 minute: {response.text}')
@@ -41,6 +42,7 @@ def ping_prod_ua_bot_func():
 
 @monitor_prod_bots_webhook_info.scheduled_job('interval', seconds=1)
 def monitor_prod_bots_webhook_info_func():
+
     ua_bot_info = get_webhook_info()
     if ua_bot_info["pending_update_count"] >= config.MAX_PENDING_UPDATE_COUNT:
         msg = f"UA_BOT: pending_update_count >= {config.MAX_PENDING_UPDATE_COUNT}\nwebhook_info: {ua_bot_info}"
@@ -48,7 +50,7 @@ def monitor_prod_bots_webhook_info_func():
         heroku_app_name = config.UA_BOT_URL_HEROKU.replace("https://", "").replace(".herokuapp.com/", "")
         current_dyno_quantity = get_current_dyno_quantity(
             app_name=heroku_app_name, process_name=config.UA_BOT_MAIN_PROCESS
-        )
+        )  # None if no dyno
         print("current_dyno_quantity=", current_dyno_quantity)
 
         new_dyno_quantity = 1
@@ -62,15 +64,15 @@ def monitor_prod_bots_webhook_info_func():
         time.sleep(10)
 
 
-if config.ENVIRONMENT == 'PROD':
-    # do NOT uncomment this while TEST app is pinging!
-    # if config.UA_BOT_URL_HEROKU is None:
-    #     notify_monitoring_chat('🆘 UA_BOT_URL_HEROKU is not set up in heroku config!')
-    # else:
-    #     ping_prod_ua_bot.start()
-
-    if config.UA_BOT_TOKEN is None:
-        notify_monitoring_chat('🆘 UA_BOT_TOKEN is not set up in heroku config!')
-    else:
-        monitor_prod_bots_webhook_info.start()
+# if config.ENVIRONMENT == 'PROD':
+#     # do NOT uncomment this while TEST app is pinging!
+#     # if config.UA_BOT_URL_HEROKU is None:
+#     #     notify_monitoring_chat('🆘 UA_BOT_URL_HEROKU is not set up in heroku config!')
+#     # else:
+#     #     ping_prod_ua_bot.start()
+#
+#     if config.UA_BOT_TOKEN is None:
+#         notify_monitoring_chat('🆘 UA_BOT_TOKEN is not set up in heroku config!')
+#     else:
+monitor_prod_bots_webhook_info.start()
 

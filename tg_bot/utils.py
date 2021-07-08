@@ -9,6 +9,21 @@ import config
 error_report_to_chat = '🆘 Error with: %s'
 
 
+def get_webhook_info():
+    tg_bot_info = requests.get(f"https://api.telegram.org/bot{config.UA_BOT_TOKEN}/getWebhookInfo")
+    if tg_bot_info is not None:
+        tg_bot_info = tg_bot_info.json()
+
+        if tg_bot_info["ok"]:
+            keep_keys = {
+                "last_error_date", "last_error_message", "max_connections", "allowed_updates", "pending_update_count"
+            }
+            return {key: value for key, value in tg_bot_info["result"].items() if key in keep_keys}
+
+        print("ERR get_webhook_info: Status not 'ok'")
+    print("ERR get_webhook_info: tg_bot_info is None")
+
+
 def is_admin(user_id):
     if user_id == config.ADMIN_ID:
         return True
@@ -100,18 +115,3 @@ def notify_monitoring_chat(message, document=False, caption='', markdown=False):
     except Exception as err:
         print(f'ERR notify_monitoring_chat: {err}')
         return False
-
-
-def get_webhook_info():
-    tg_bot_info = requests.get(f"https://api.telegram.org/bot{config.UA_BOT_TOKEN}/getWebhookInfo")
-    if tg_bot_info is not None:
-        tg_bot_info = tg_bot_info.json()
-
-        if tg_bot_info["ok"]:
-            keep_keys = {
-                "last_error_date", "last_error_message", "max_connections", "allowed_updates", "pending_update_count"
-            }
-            return {key: value for key, value in tg_bot_info["result"].items() if key in keep_keys}
-
-        print("ERR get_webhook_info: Status not 'ok'")
-    print("ERR get_webhook_info: tg_bot_info is None")

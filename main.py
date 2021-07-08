@@ -1,3 +1,4 @@
+import os
 import time
 import telebot
 from flask import Flask, request
@@ -24,9 +25,9 @@ def home():
 
 if __name__ == "__main__":
     # from tg_bot.standard_handlers import *
-    from tg_bot.message_handlers import *
     # from tg_bot.querry_handlers import *
-    # from clock import *
+    from tg_bot.message_handlers import *
+    from monitoring.clock import *
 
     if config.USE_WEBHOOK:
         bot.set_webhook(url=config.APP_URL_HEROKU + config.BOT_TOKEN, max_connections=100)
