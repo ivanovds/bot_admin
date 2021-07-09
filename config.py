@@ -17,13 +17,16 @@ USERS = [ADMIN_ID, 301327435]
 MONITORING_CHAT_ID = os.environ.get("MONITORING_CHAT_ID")
 
 
-UA_BOT_URL_HEROKU = os.environ.get("UA_BOT_URL_HEROKU", None)  # PROD bot
+BOT_MAIN_PROCESS = os.environ.get("UA_BOT_MAIN_PROCESS", "web")
+ALERT_PENDING_UPDATE_COUNT = int(os.environ.get("ALERT_PENDING_UPDATE_COUNT", 3))
+MAX_PENDING_UPDATE_COUNT = int(os.environ.get("MAX_PENDING_UPDATE_COUNT", 5))
+
+
+# Bots to be monitored:
+UA_BOT_URL_HEROKU = os.environ.get("UA_BOT_URL_HEROKU", None)
 UA_BOT_TOKEN = os.environ.get("UA_BOT_TOKEN")
 UA_BOT_HEROKU_API_KEY = os.environ.get("UA_BOT_HEROKU_API_KEY")
-UA_BOT_MAIN_PROCESS = os.environ.get("UA_BOT_MAIN_PROCESS", "web")
 
-
-MAX_PENDING_UPDATE_COUNT = int(os.environ.get("MAX_PENDING_UPDATE_COUNT", 5))
 
 if os.path.isfile("./config_user.py"):
     from config_user import *
