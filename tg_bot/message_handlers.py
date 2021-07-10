@@ -41,13 +41,10 @@ def get_webhook_info_command(message):
     from monitoring.scale import ua_bot_monitor
     ua_bot_monitor.stop()
     time.sleep(1)
-
-    ua_bot_monitor = BotMonitor(bot_token=config.UA_BOT_TOKEN, bot_url_heroku=config.UA_BOT_URL_HEROKU,
-                                bot_heroku_api_key=config.UA_BOT_HEROKU_API_KEY, process_name=config.BOT_MAIN_PROCESS)
     ua_bot_monitor.start()
 
     bot.send_message(chat_id=message.from_user.id,
-                     text='Monitoring successfully started!')
+                     text='Monitoring successfully (re)started!')
 
 
 @bot.message_handler(commands=['ua_stop_monitoring'])
@@ -62,6 +59,7 @@ def get_webhook_info_command(message):
 # @bot.message_handler(commands=['test'])
 # @message_admin_access()
 # def test_command(message):
+#
 #     print('ok')
 
 

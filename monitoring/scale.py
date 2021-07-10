@@ -1,5 +1,4 @@
 import time
-import base64
 import json
 import threading
 import requests
@@ -7,38 +6,39 @@ import requests
 import config
 from tg_bot.utils import notify_monitoring_chat
 
+FREE_SIZE = 'Free'
+STANDARD_SIZE = 'standard-1x'
+
 
 class BotMonitor(threading.Thread):
 
-    def __init__(self, bot_token, bot_url_heroku, bot_heroku_api_key, process_name):
+    def __init__(self, bot_token, bot_url_heroku, bot_heroku_auth_token, process_name):
         threading.Thread.__init__(self)
         self.heroku_app_name = bot_url_heroku.replace("https://", "").replace(".herokuapp.com/", "")
         self.bot_token = bot_token
         self.process_name = process_name
         self.pending_update_count = 0
-        # Generate Base64 encoded API Key
-        base_key = base64.b64encode((":" + bot_heroku_api_key).encode("utf-8"))
-        # Create headers for API call
-        self.headers = {"Accept": "application/vnd.heroku+json; version=3", "Authorization": base_key}
+        self.current_dyno_quantity = 0
+        self.headers = {"Accept": "application/vnd.heroku+json; version=3"}
+        self.bot_heroku_auth_token = bot_heroku_auth_token
 
         self.shutdown_flag = threading.Event()
 
     def run(self):
         while not self.shutdown_flag.is_set():
             time.sleep(1)
+            print('while')  # TEMP
 
             bot_info = get_webhook_info(self.bot_token)
             self.pending_update_count = bot_info["pending_update_count"]
-            if self.pending_update_count >= config.MAX_PENDING_UPDATE_COUNT:
+            if self.pending_update_count >= config.SCALE_ONCE_PENDING_UPDATE_COUNT:
                 msg = f"{self.heroku_app_name} reached or exceeded " \
-                      f"MAX_PENDING_UPDATE_COUNT({config.MAX_PENDING_UPDATE_COUNT}) — " \
-                      f"{self.pending_update_count}\nwebhook_info: {bot_info}\n\nScale it ASAP!!!"
+                      f"SCALE_ONCE_PENDING_UPDATE_COUNT({config.SCALE_ONCE_PENDING_UPDATE_COUNT}) — " \
+                      f"{self.pending_update_count}\nwebhook_info: {bot_info}\n\nStarting to scale..."
                 print(msg)
                 notify_monitoring_chat(msg)
 
-                # self.scaling_handler()  TODO: implement
-
-                time.sleep(60)  # TEMP
+                self.scaling_up_handler()
 
             elif self.pending_update_count >= config.ALERT_PENDING_UPDATE_COUNT:
                 msg = f"{self.heroku_app_name} reached or exceeded " \
@@ -47,27 +47,38 @@ class BotMonitor(threading.Thread):
                 print(msg)
                 notify_monitoring_chat(msg)
 
-                time.sleep(60)  # TEMP
+    def scaling_up_handler(self):
+        self.current_dyno_quantity = self.get_current_dyno_quantity() if not None else 0  # None if no dyno
 
-    def scaling_handler(self):
-        current_dyno_quantity = self.get_current_dyno_quantity()  # None if no dyno
-        print("current_dyno_quantity=", current_dyno_quantity)
-
-        new_dyno_quantity = self.get_new_dyno_quantity()
-        success = self.scale_dynos(new_dyno_quantity=new_dyno_quantity)
-
-        if success:
-            msg = f"Scaled from {current_dyno_quantity} to {new_dyno_quantity} dynos!"
+        new_dyno_quantity = None
+        new_size = None
+        if self.pending_update_count > config.SCALE_TWICE_PENDING_UPDATE_COUNT:  # +2
+            new_dyno_quantity = min(self.current_dyno_quantity + 2, config.MAX_DYNO_QUANTITY)
+            new_size = STANDARD_SIZE
+        elif self.current_dyno_quantity is None:
+            new_dyno_quantity = 1
+            new_size = FREE_SIZE
+        elif self.current_dyno_quantity in [i for i in range(1, config.MAX_DYNO_QUANTITY)]:  # +1
+            new_dyno_quantity = self.current_dyno_quantity + 1  # up to MAX_DYNO_QUANTITY
+            new_size = STANDARD_SIZE
+        elif self.current_dyno_quantity == config.MAX_DYNO_QUANTITY:
+            msg = f"🆘 {self.heroku_app_name} reached MAX_DYNOS={config.MAX_DYNO_QUANTITY} " \
+                  f"but has {self.pending_update_count} of pending_update_count!\n\nDo something ASAP!!!"
             print(msg)
             notify_monitoring_chat(msg)
+            time.sleep(10)
 
-    def get_new_dyno_quantity(self):
-        return 2  # TODO: implement
+        if None not in [new_size, new_dyno_quantity]:
+            self.scale_dynos(new_dyno_quantity=new_dyno_quantity, new_size=new_size)
+
+    def scaling_down_handler(self):  # TODO: implement
+        pass
 
     def get_current_dyno_quantity(self):
         url = f"https://api.heroku.com/apps/{self.heroku_app_name}/formation/"
         try:
-            result = requests.get(url, headers=self.headers)
+            result = requests.get(url, headers=self.headers, auth=('', self.bot_heroku_auth_token))
+            print(result.json())
             if result.ok:
                 for formation in json.loads(result.text):
                     if formation["type"] == self.process_name:
@@ -82,12 +93,13 @@ class BotMonitor(threading.Thread):
             print(err_msg)
             notify_monitoring_chat(err_msg)
 
-    def scale_dynos(self, new_dyno_quantity):
-        payload = {"quantity": new_dyno_quantity}
+    def scale_dynos(self, new_dyno_quantity, new_size):
+        payload = {"quantity": new_dyno_quantity, "size": new_size}
         json_payload = json.dumps(payload)
         url = f"https://api.heroku.com/apps/{self.heroku_app_name}/formation/{self.process_name}"
         try:
-            result = requests.patch(url, headers=self.headers, data=json_payload)
+            result = requests.patch(url, headers=self.headers, data=json_payload,
+                                    auth=('', self.bot_heroku_auth_token))
         except Exception as e:
             err_msg = f"ERR scale_dynos: {e}"
             print(err_msg)
@@ -95,6 +107,12 @@ class BotMonitor(threading.Thread):
             return False
 
         if result.status_code == 200:
+            msg = f"Scaled from {self.current_dyno_quantity} to {new_dyno_quantity} dynos!\n\nresult: {result.json()}"
+            print(msg)
+            notify_monitoring_chat(msg)
+
+            time.sleep(60)  # TODO: do smth better
+
             return True
         else:
             err_msg = f"ERR scale_dynos: failed to scale.\nresult: {result.text}"
@@ -132,6 +150,8 @@ def get_webhook_info(bot_token):
         notify_monitoring_chat(err_msg)
 
 
-ua_bot_monitor = BotMonitor(bot_token=config.UA_BOT_TOKEN, bot_url_heroku=config.UA_BOT_URL_HEROKU,
-                            bot_heroku_api_key=config.UA_BOT_HEROKU_API_KEY, process_name=config.BOT_MAIN_PROCESS)
+ua_bot_monitor = BotMonitor(bot_token=config.UA_BOT_TOKEN,
+                            bot_url_heroku=config.UA_BOT_URL_HEROKU,
+                            bot_heroku_auth_token=config.UA_BOT_HEROKU_AUTH_TOKEN,
+                            process_name=config.BOT_MAIN_PROCESS)
 ua_bot_monitor.start()

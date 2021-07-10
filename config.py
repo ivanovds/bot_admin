@@ -19,13 +19,15 @@ MONITORING_CHAT_ID = os.environ.get("MONITORING_CHAT_ID")
 
 BOT_MAIN_PROCESS = os.environ.get("UA_BOT_MAIN_PROCESS", "web")
 ALERT_PENDING_UPDATE_COUNT = int(os.environ.get("ALERT_PENDING_UPDATE_COUNT", 3))
-MAX_PENDING_UPDATE_COUNT = int(os.environ.get("MAX_PENDING_UPDATE_COUNT", 5))
+SCALE_ONCE_PENDING_UPDATE_COUNT = int(os.environ.get("SCALE_ONCE_PENDING_UPDATE_COUNT", 5))
+SCALE_TWICE_PENDING_UPDATE_COUNT = int(os.environ.get("SCALE_TWICE_PENDING_UPDATE_COUNT", 100))
+MAX_DYNO_QUANTITY = int(os.environ.get("MAX_DYNO_QUANTITY", 3))  # 3dyno * 30threads = 90+ database connections
 
 
 # Bots to be monitored:
 UA_BOT_URL_HEROKU = os.environ.get("UA_BOT_URL_HEROKU", None)
 UA_BOT_TOKEN = os.environ.get("UA_BOT_TOKEN")
-UA_BOT_HEROKU_API_KEY = os.environ.get("UA_BOT_HEROKU_API_KEY")
+UA_BOT_HEROKU_AUTH_TOKEN = os.environ.get("UA_BOT_HEROKU_AUTHORIZATION_TOKEN")
 
 
 if os.path.isfile("./config_user.py"):
