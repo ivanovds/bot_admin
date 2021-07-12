@@ -27,7 +27,6 @@ class BotMonitor(threading.Thread):
     def run(self):
         while not self.shutdown_flag.is_set():
             time.sleep(1)
-            print('while')  # TEMP
 
             bot_info = get_webhook_info(self.bot_token)
             self.pending_update_count = bot_info["pending_update_count"]
