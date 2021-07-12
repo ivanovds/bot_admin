@@ -1,15 +1,13 @@
 """
 Handlers for all non standard incoming messages
 """
-import os
-
-
+import time
+import config
 from tg_bot import bot, dict_text
-from tg_bot import reply_markup as rm
 from .utils import (
-    is_admin, notify_admin, message_user_access,
-    message_admin_access, get_webhook_info,
-)
+    message_user_access,
+    message_admin_access, )
+from monitoring.scale import get_webhook_info, BotMonitor
 
 
 @bot.message_handler(commands=['start'])
@@ -18,7 +16,7 @@ def start_command(message, cancel_message=False):
     if cancel_message:
         msg = dict_text.canceled
     else:
-        msg = dict_text.start_inline_menu
+        msg = dict_text.start_inline_menu + f'\n\n{dict_text.help_text}'
 
     bot.send_message(message.from_user.id, msg)
 
@@ -27,22 +25,35 @@ def start_command(message, cancel_message=False):
 @message_user_access()
 def help_command(message):
     bot.send_message(chat_id=message.from_user.id,
-                     text=dict_text.help_text,
-                     disable_web_page_preview=True)
-
-
-@bot.message_handler(regexp=f'^{dict_text.b_cancel}$')
-@message_user_access()
-def canceled(message):
-    start_command(message, cancel_message=True)
+                     text=dict_text.help_text,)
 
 
 @bot.message_handler(commands=['ua_webhook_info'])
 @message_user_access()
 def get_webhook_info_command(message):
     bot.send_message(chat_id=message.from_user.id,
-                     text=get_webhook_info(),
-                     disable_web_page_preview=True)
+                     text=str(get_webhook_info(config.UA_BOT_TOKEN)))
+
+
+@bot.message_handler(commands=['ua_start_monitoring'])
+@message_user_access()
+def get_webhook_info_command(message):
+    from monitoring.scale import ua_bot_monitor
+    ua_bot_monitor.stop()
+    time.sleep(1)
+    ua_bot_monitor.start()
+
+    bot.send_message(chat_id=message.from_user.id,
+                     text='Monitoring successfully (re)started!')
+
+
+@bot.message_handler(commands=['ua_stop_monitoring'])
+@message_user_access()
+def get_webhook_info_command(message):
+    from monitoring.scale import ua_bot_monitor
+    ua_bot_monitor.stop()
+    bot.send_message(chat_id=message.from_user.id,
+                     text='Monitoring successfully stopped!')
 
 
 # @bot.message_handler(commands=['test'])

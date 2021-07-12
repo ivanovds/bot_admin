@@ -1,8 +1,5 @@
 from functools import wraps
 
-import requests
-import telebot
-
 from tg_bot import bot
 import config
 
@@ -74,44 +71,29 @@ def notify_admin(message):
     except Exception as err:
         err_msg = error_report_to_chat % f'ERR notify_admin: {err}'
         print(err_msg)
-        notify_feedback_chat(err_msg)
+        notify_monitoring_chat(err_msg)
         return False
 
 
 # Feedback chat notifications:
-def notify_feedback_chat(message, document=False, caption='', markdown=False):
+def notify_monitoring_chat(message, document=False, caption='', markdown=False):
     try:
         if not document:
             if markdown:
-                bot.send_message(chat_id=config.FEEDBACK_CHAT_ID,
+                bot.send_message(chat_id=config.MONITORING_CHAT_ID,
                                  text=message,
                                  )
             else:
-                bot.send_message(chat_id=config.FEEDBACK_CHAT_ID,
+                bot.send_message(chat_id=config.MONITORING_CHAT_ID,
                                  text=message,
                                  )
         else:
-            bot.send_document(chat_id=config.FEEDBACK_CHAT_ID,
+            bot.send_document(chat_id=config.MONITORING_CHAT_ID,
                               data=message,
                               caption=caption
                               )
 
         return True
     except Exception as err:
-        print(f'ERR notify_feedback_chat: {err}')
+        print(f'ERR notify_monitoring_chat: {err}')
         return False
-
-
-def get_webhook_info():
-    tg_bot_info = requests.get(f"https://api.telegram.org/bot{config.UA_BOT_TOKEN}/getWebhookInfo")
-    if tg_bot_info is not None:
-        tg_bot_info = tg_bot_info.json()
-
-        if tg_bot_info["ok"]:
-            keep_keys = {
-                "last_error_date", "last_error_message", "max_connections", "allowed_updates", "pending_update_count"
-            }
-            return {key: value for key, value in tg_bot_info["result"] if key in keep_keys}
-
-        print("ERR get_webhook_info: Status not 'ok'")
-    print("ERR get_webhook_info: tg_bot_info is None")
