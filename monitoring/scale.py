@@ -52,7 +52,8 @@ class BotMonitor(threading.Thread):
 
         new_dyno_quantity = None
         new_size = None
-        if self.pending_update_count > config.SCALE_TWICE_PENDING_UPDATE_COUNT:  # +2
+        if self.pending_update_count > config.SCALE_TWICE_PENDING_UPDATE_COUNT and (
+                self.current_dyno_quantity != config.MAX_DYNO_QUANTITY):  # +2
             new_dyno_quantity = min(self.current_dyno_quantity + 2, config.MAX_DYNO_QUANTITY)
             new_size = STANDARD_SIZE
         elif self.current_dyno_quantity is None:
