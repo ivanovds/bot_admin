@@ -27,7 +27,7 @@ MAX_DYNO_QUANTITY = int(os.environ.get("MAX_DYNO_QUANTITY", 3))  # 3dyno * 30thr
 # Bots to be monitored:
 UA_BOT_URL_HEROKU = os.environ.get("UA_BOT_URL_HEROKU", None)
 UA_BOT_TOKEN = os.environ.get("UA_BOT_TOKEN")
-UA_BOT_HEROKU_AUTH_TOKEN = os.environ.get("UA_BOT_HEROKU_AUTHORIZATION_TOKEN")
+UA_BOT_HEROKU_AUTH_TOKEN = os.environ.get("UA_BOT_HEROKU_AUTH_TOKEN")
 
 
 if os.path.isfile("./config_user.py"):
