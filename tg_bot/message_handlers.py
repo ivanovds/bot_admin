@@ -56,16 +56,20 @@ def get_webhook_info_command(message):
                      text='Monitoring successfully stopped!')
 
 
-# @bot.message_handler(commands=['test'])
-# @message_admin_access()
-# def test_command(message):
-#
-#     print('ok')
+@bot.message_handler(commands=['test'])
+@message_admin_access()
+def test_command(message):
+    from monitoring.scale import BotMonitor
+    ua_bot_monitor = BotMonitor(bot_token=config.UA_BOT_TOKEN,
+                                bot_url_heroku=config.UA_BOT_URL_HEROKU,
+                                bot_heroku_auth_token=config.UA_BOT_HEROKU_AUTH_TOKEN,
+                                process_name=config.BOT_MAIN_PROCESS)
+
+    current_dyno_quantity = ua_bot_monitor.get_current_dyno_quantity()
+
+    print(current_dyno_quantity)
 
 
 @bot.message_handler(content_types=["text", "photo", "document"])
 def general_con(message):
     start_command(message)
-
-
-
