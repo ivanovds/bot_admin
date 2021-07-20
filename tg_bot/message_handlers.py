@@ -35,23 +35,13 @@ def get_webhook_info_command(message):
                      text=str(get_webhook_info(config.UA_BOT_TOKEN)))
 
 
-@bot.message_handler(commands=['ua_start_monitoring'])
-@message_user_access()
-def ua_start_monitoring_command(message):
-    ua_bot_monitor.stop()
-    time.sleep(1)
-    ua_bot_monitor.start()
-
-    bot.send_message(chat_id=message.from_user.id,
-                     text='Monitoring successfully (re)started!')
-
-
 @bot.message_handler(commands=['ua_stop_monitoring'])
 @message_user_access()
 def ua_stop_monitoring_command(message):
     ua_bot_monitor.stop()
     bot.send_message(chat_id=message.from_user.id,
-                     text='Monitoring successfully stopped!')
+                     text='Monitoring successfully stopped!\n'
+                          'To start it again: restart all dynos in Heroku «bots-admin» account.')
 
 
 @bot.message_handler(commands=['ua_current_dyno_quantity'])

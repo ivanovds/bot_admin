@@ -10,6 +10,7 @@ help_text = '''Commands:
 /ua_webhook_info — get webhook_info of UA bot
 /ua_start_monitoring — start monitoring and autoscaling of UA bot
 /ua_stop_monitoring — stop monitoring and autoscaling of UA bot
+/ua_current_dyno_quantity - get current dyno quantity
 '''
 
 b_cancel = 'Cancel'
