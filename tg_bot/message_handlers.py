@@ -39,11 +39,14 @@ def get_webhook_info_command(message):
 @message_user_access()
 def ua_start_monitoring_command(message):
     ua_bot_monitor.stop()
+    print('stopped')
     time.sleep(1)
+    print('slept')
     ua_bot_monitor.start()
-
+    print('started')
     bot.send_message(chat_id=message.from_user.id,
                      text='Monitoring successfully (re)started!')
+    print('sent')
 
 
 @bot.message_handler(commands=['ua_stop_monitoring'])
