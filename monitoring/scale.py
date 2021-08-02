@@ -49,13 +49,11 @@ class BotMonitor(threading.Thread):
     def scaling_up_handler(self):
         self.current_dyno_quantity = self.get_current_dyno_quantity() if not None else 0  # None if no dyno
 
-        new_dyno_quantity = None
-        new_size = None
         if self.pending_update_count > config.SCALE_TWICE_PENDING_UPDATE_COUNT and (
                 self.current_dyno_quantity != config.MAX_DYNO_QUANTITY):  # +2
             new_dyno_quantity = min(self.current_dyno_quantity + 2, config.MAX_DYNO_QUANTITY)
             new_size = STANDARD_SIZE
-        elif self.current_dyno_quantity is None:
+        elif self.current_dyno_quantity == 0:
             new_dyno_quantity = 1
             new_size = FREE_SIZE
         elif self.current_dyno_quantity in [i for i in range(1, config.MAX_DYNO_QUANTITY)]:  # +1
@@ -67,9 +65,14 @@ class BotMonitor(threading.Thread):
             print(msg)
             notify_monitoring_chat(msg)
             time.sleep(10)
+            return
+        else:
+            msg = f"ERR scaling_up_handler: did not entered to any if-elif!"
+            print(msg)
+            notify_monitoring_chat(msg)
+            return
 
-        if None not in [new_size, new_dyno_quantity]:
-            self.scale_dynos(new_dyno_quantity=new_dyno_quantity, new_size=new_size)
+        self.scale_dynos(new_dyno_quantity=new_dyno_quantity, new_size=new_size)
 
     def scaling_down_handler(self):  # TODO: implement
         pass
