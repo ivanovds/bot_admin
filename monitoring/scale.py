@@ -21,6 +21,7 @@ class BotMonitor(threading.Thread):
         self.current_dyno_quantity = 0
         self.headers = {"Accept": "application/vnd.heroku+json; version=3"}
         self.bot_heroku_auth_token = bot_heroku_auth_token
+        self.seconds_after_last_scaling = None  # set to zero in order to start timer
 
         self.shutdown_flag = threading.Event()
 
@@ -46,6 +47,13 @@ class BotMonitor(threading.Thread):
                 print(msg)
                 notify_monitoring_chat(msg)
 
+            elif self.seconds_after_last_scaling is not None:
+                if self.pending_update_count == 0 and (
+                        self.seconds_after_last_scaling > config.SECONDS_TO_WAIT_BEFORE_SCALING_DOWN):
+                    self.scaling_down_handler()
+                else:
+                    self.seconds_after_last_scaling += 1
+
     def scaling_up_handler(self):
         self.current_dyno_quantity = self.get_current_dyno_quantity() if not None else 0  # None if no dyno
 
@@ -67,15 +75,36 @@ class BotMonitor(threading.Thread):
             time.sleep(10)
             return
         else:
-            msg = f"ERR scaling_up_handler: did not entered to any if-elif!"
+            msg = f"ERR scaling_up_handler: did not entered to any if-elif!\n" \
+                  f"current_dyno_quantity = {self.current_dyno_quantity}"
             print(msg)
             notify_monitoring_chat(msg)
             return
 
         self.scale_dynos(new_dyno_quantity=new_dyno_quantity, new_size=new_size)
+        self.seconds_after_last_scaling = 0
 
-    def scaling_down_handler(self):  # TODO: implement
-        pass
+    def scaling_down_handler(self):
+        self.current_dyno_quantity = self.get_current_dyno_quantity() if not None else 0  # None if no dyno
+
+        if self.current_dyno_quantity >= 3:
+            new_dyno_quantity = self.current_dyno_quantity - 1
+            new_size = STANDARD_SIZE
+            self.seconds_after_last_scaling = 0  # because we can still scale down
+        elif self.current_dyno_quantity == 2:
+            new_dyno_quantity = 1
+            new_size = FREE_SIZE
+            self.seconds_after_last_scaling = None  # because we can NOT scale down anymore
+        else:
+            self.seconds_after_last_scaling = None
+            msg = f"ERR scaling_down_handler: did not entered to any if-elif!\n" \
+                  f"current_dyno_quantity = {self.current_dyno_quantity}\n\n" \
+                  f"Timer was stopped so it will not be scaled down."
+            print(msg)
+            notify_monitoring_chat(msg)
+            return
+
+        self.scale_dynos(new_dyno_quantity=new_dyno_quantity, new_size=new_size)
 
     def get_current_dyno_quantity(self):
         url = f"https://api.heroku.com/apps/{self.heroku_app_name}/formation/"
