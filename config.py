@@ -22,6 +22,7 @@ ALERT_PENDING_UPDATE_COUNT = int(os.environ.get("ALERT_PENDING_UPDATE_COUNT", 3)
 SCALE_ONCE_PENDING_UPDATE_COUNT = int(os.environ.get("SCALE_ONCE_PENDING_UPDATE_COUNT", 5))
 SCALE_TWICE_PENDING_UPDATE_COUNT = int(os.environ.get("SCALE_TWICE_PENDING_UPDATE_COUNT", 100))
 MAX_DYNO_QUANTITY = int(os.environ.get("MAX_DYNO_QUANTITY", 3))  # 3dyno * 30threads = 90+ database connections
+SECONDS_TO_WAIT_BEFORE_SCALING_DOWN = int(os.environ.get("SECONDS_TO_WAIT_BEFORE_SCALING_DOWN", 300))
 
 
 # Bots to be monitored:
