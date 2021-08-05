@@ -21,8 +21,7 @@ class BotMonitor(threading.Thread):
         self.current_dyno_quantity = 0
         self.headers = {"Accept": "application/vnd.heroku+json; version=3"}
         self.bot_heroku_auth_token = bot_heroku_auth_token
-        # self.seconds_after_last_scaling = None  # set to zero in order to start timer
-        self.seconds_after_last_scaling = 0
+        self.seconds_after_last_scaling = None  # set to zero in order to start timer
 
         self.shutdown_flag = threading.Event()
 
