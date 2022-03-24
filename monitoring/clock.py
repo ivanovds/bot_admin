@@ -9,6 +9,7 @@ from tg_bot.utils import notify_monitoring_chat
 
 ping_yourself = BackgroundScheduler()
 ping_prod_ua_bot = BackgroundScheduler()
+ping_landing = BackgroundScheduler()
 
 
 @ping_yourself.scheduled_job('interval', minutes=5)
@@ -32,6 +33,17 @@ def ping_prod_ua_bot_func():
 
     if response.status_code != 200:
         err_msg = '🆘 ERR ping_prod_ua_bot_func: UA bot APP is not responding!'
+        print(err_msg)
+        notify_monitoring_chat(err_msg)
+
+
+@ping_landing.scheduled_job('interval', minutes=10)
+def ping_landing_func():
+    response = requests.request("GET", config.LANDING_URL_HEROKU)
+    print(f'SCHEDULED_JOB: Landing ping every 10 minutes: {response.status_code}')
+
+    if response.status_code != 200:
+        err_msg = '🆘 ERR ping_landing_func: UA bot APP is not responding!'
         print(err_msg)
         notify_monitoring_chat(err_msg)
 

@@ -7,6 +7,7 @@ USE_WEBHOOK = True
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
 APP_URL_HEROKU = os.environ.get("APP_URL_HEROKU")
 ENVIRONMENT = os.environ.get("ENVIRONMENT", None)  # "DEV"/"TEST"/"PROD"
+LANDING_URL_HEROKU = os.environ.get("LANDING_URL_HEROKU", 'https://corona-travel-bot.herokuapp.com/')
 
 # DBP = f"host={os.environ.get("DB_HOST")} dbname={os.environ.get("DB_NAME")} user={os.environ.get("DB_USER")}" \
 #       f" password={os.environ.get("DB_PASSWORD")}  connect_timeout=3"
