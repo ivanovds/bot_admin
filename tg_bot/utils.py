@@ -1,4 +1,5 @@
 from functools import wraps
+import requests
 
 from tg_bot import bot
 import config
