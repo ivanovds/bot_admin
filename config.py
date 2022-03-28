@@ -14,7 +14,7 @@ LANDING_URL_HEROKU = os.environ.get("LANDING_URL_HEROKU", 'https://corona-travel
 
 
 ADMIN_ID = 298760372
-USERS = [ADMIN_ID, 301327435]
+USERS = [ADMIN_ID]
 MONITORING_CHAT_ID = os.environ.get("MONITORING_CHAT_ID")
 
 

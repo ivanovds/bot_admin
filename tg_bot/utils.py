@@ -6,6 +6,14 @@ import config
 error_report_to_chat = '🆘 Error with: %s'
 
 
+def restart_all_dynos():
+    headers = {"Accept": "application/vnd.heroku+json; version=3",
+               "Content-Type": "application/json"}
+
+    requests.delete('https://api.heroku.com/apps/bots-admin/dynos',
+                    headers=headers)
+
+
 def is_admin(user_id):
     if user_id == config.ADMIN_ID:
         return True

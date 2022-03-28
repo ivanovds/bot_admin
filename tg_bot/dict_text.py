@@ -11,6 +11,7 @@ help_text = '''Commands:
 /ua_start_monitoring — start monitoring and autoscaling of UA bot
 /ua_stop_monitoring — stop monitoring and autoscaling of UA bot
 /ua_current_dyno_quantity - get current dyno quantity
+/restart_all_dynos - restart all dynos
 '''
 
 b_cancel = 'Cancel'
