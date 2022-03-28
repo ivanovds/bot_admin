@@ -9,7 +9,8 @@ error_report_to_chat = '🆘 Error with: %s'
 
 def restart_all_dynos():
     headers = {"Accept": "application/vnd.heroku+json; version=3",
-               "Content-Type": "application/json"}
+               "Content-Type": "application/json",
+               "Authorization": f"Bearer {config.API_KEY}"}
 
     requests.delete('https://api.heroku.com/apps/bots-admin/dynos',
                     headers=headers)
