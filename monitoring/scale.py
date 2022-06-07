@@ -12,7 +12,7 @@ STANDARD_SIZE = 'standard-1x'
 
 class BotMonitor(threading.Thread):
 
-    def __init__(self, bot_token, bot_url_heroku, bot_heroku_auth_token, process_name):
+    def __init__(self, bot_token, bot_url_heroku, bot_heroku_api_key, process_name):
         threading.Thread.__init__(self)
         self.heroku_app_name = bot_url_heroku.replace("https://", "").replace(".herokuapp.com/", "")
         self.bot_token = bot_token
@@ -20,7 +20,7 @@ class BotMonitor(threading.Thread):
         self.pending_update_count = 0
         self.current_dyno_quantity = 0
         self.headers = {"Accept": "application/vnd.heroku+json; version=3"}
-        self.bot_heroku_auth_token = bot_heroku_auth_token
+        self.bot_heroku_api_key = bot_heroku_api_key
         self.seconds_after_last_scaling = None  # set to zero in order to start timer
 
         self.shutdown_flag = threading.Event()
@@ -109,7 +109,7 @@ class BotMonitor(threading.Thread):
     def get_current_dyno_quantity(self):
         url = f"https://api.heroku.com/apps/{self.heroku_app_name}/formation/"
         try:
-            result = requests.get(url, headers=self.headers, auth=('', self.bot_heroku_auth_token))
+            result = requests.get(url, headers=self.headers, auth=('', self.bot_heroku_api_key))
             print(result.json())
             if result.ok:
                 for formation in json.loads(result.text):
@@ -131,7 +131,7 @@ class BotMonitor(threading.Thread):
         url = f"https://api.heroku.com/apps/{self.heroku_app_name}/formation/{self.process_name}"
         try:
             result = requests.patch(url, headers=self.headers, data=json_payload,
-                                    auth=('', self.bot_heroku_auth_token))
+                                    auth=('', self.bot_heroku_api_key))
         except Exception as e:
             err_msg = f"ERR scale_dynos: {e}"
             print(err_msg)
@@ -184,6 +184,6 @@ def get_webhook_info(bot_token):
 
 ua_bot_monitor = BotMonitor(bot_token=config.UA_BOT_TOKEN,
                             bot_url_heroku=config.UA_BOT_URL_HEROKU,
-                            bot_heroku_auth_token=config.UA_BOT_HEROKU_AUTH_TOKEN,
+                            bot_heroku_api_key=config.UA_BOT_HEROKU_API_KEY,
                             process_name=config.BOT_MAIN_PROCESS)
 ua_bot_monitor.start()

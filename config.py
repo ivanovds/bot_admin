@@ -8,7 +8,7 @@ BOT_TOKEN = os.environ.get("BOT_TOKEN")
 APP_URL_HEROKU = os.environ.get("APP_URL_HEROKU")
 ENVIRONMENT = os.environ.get("ENVIRONMENT", None)  # "DEV"/"TEST"/"PROD"
 LANDING_URL_HEROKU = os.environ.get("LANDING_URL_HEROKU", 'https://corona-travel-bot.herokuapp.com/')
-API_KEY = os.environ.get("API_KEY", None)
+THIS_BOT_HEROKU_API_KEY = os.environ.get("THIS_BOT_HEROKU_API_KEY", None)
 
 # DBP = f"host={os.environ.get("DB_HOST")} dbname={os.environ.get("DB_NAME")} user={os.environ.get("DB_USER")}" \
 #       f" password={os.environ.get("DB_PASSWORD")}  connect_timeout=3"
@@ -30,7 +30,7 @@ SECONDS_TO_WAIT_BEFORE_SCALING_DOWN = int(os.environ.get("SECONDS_TO_WAIT_BEFORE
 # Bots to be monitored:
 UA_BOT_URL_HEROKU = os.environ.get("UA_BOT_URL_HEROKU", None)
 UA_BOT_TOKEN = os.environ.get("UA_BOT_TOKEN")
-UA_BOT_HEROKU_AUTH_TOKEN = os.environ.get("UA_BOT_HEROKU_AUTH_TOKEN")
+UA_BOT_HEROKU_API_KEY = os.environ.get("UA_BOT_HEROKU_API_KEY")
 
 
 if os.path.isfile("./config_user.py"):
