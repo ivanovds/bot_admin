@@ -11,6 +11,8 @@ ping_yourself = BackgroundScheduler()
 ping_prod_ua_bot = BackgroundScheduler()
 ping_landing = BackgroundScheduler()
 
+ping_prod_molfar = BackgroundScheduler()
+
 
 @ping_yourself.scheduled_job('interval', minutes=5)
 def ping_yourself_func():
@@ -44,6 +46,27 @@ def ping_landing_func():
 
     if response.status_code != 200:
         err_msg = '🆘 ERR ping_landing_func: UA bot APP is not responding!'
+        print(err_msg)
+        notify_monitoring_chat(err_msg)
+
+
+@ping_prod_molfar.scheduled_job('interval', minutes=3)
+def ping_prod_molfar_func():
+    """Molfar (army-tickets) project"""
+
+    response = requests.request("GET", config.MOLFAR_BE_URL_HEROKU)
+    print(f'SCHEDULED_JOB: Molfar Backend ping every 3 minutes: {response.text}')
+
+    if response.status_code != 200:
+        err_msg = '🆘 ERR ping_prod_molfar_func: Molfar (Backend) is not responding!'
+        print(err_msg)
+        notify_monitoring_chat(err_msg)
+
+    response = requests.request("GET", config.MOLFAR_FE_URL_HEROKU)
+    print(f'SCHEDULED_JOB: Molfar Frontend ping every 3 minutes: {response.text}')
+
+    if response.status_code != 200:
+        err_msg = '🆘 ERR ping_prod_molfar_func: Molfar (Frontend) is not responding!'
         print(err_msg)
         notify_monitoring_chat(err_msg)
 
