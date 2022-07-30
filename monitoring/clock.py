@@ -11,6 +11,7 @@ ping_yourself = BackgroundScheduler()
 ping_prod_ua_bot = BackgroundScheduler()
 ping_landing = BackgroundScheduler()
 
+# other projects:
 ping_prod_molfar = BackgroundScheduler()
 
 
@@ -23,9 +24,6 @@ def ping_yourself_func():
         err_msg = '🆘 ERR ping_yourself_func: bot_admin APP is not responding!'
         print(err_msg)
         notify_monitoring_chat(err_msg)
-
-
-ping_yourself.start()
 
 
 @ping_prod_ua_bot.scheduled_job('interval', minutes=1)
@@ -69,6 +67,11 @@ def ping_prod_molfar_func():
         err_msg = '🆘 ERR ping_prod_molfar_func: Molfar (Frontend) is not responding!'
         print(err_msg)
         notify_monitoring_chat(err_msg)
+
+
+ping_yourself.start()
+ping_landing.start()
+ping_prod_molfar.start()
 
 
 if config.ENVIRONMENT == 'PROD':
