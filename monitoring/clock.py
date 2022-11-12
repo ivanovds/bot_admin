@@ -71,7 +71,7 @@ def ping_prod_molfar_func():
 
 ping_yourself.start()
 ping_landing.start()
-ping_prod_molfar.start()
+# ping_prod_molfar.start()
 
 
 if config.ENVIRONMENT == 'PROD':
